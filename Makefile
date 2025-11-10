@@ -52,7 +52,7 @@ C_SOURCES += \
 	$(LIBRARY_C_SOURCES) \
 	
 C_SOURCES += \
-	$(FREEROTS_SOURCES) \
+	$(FREERTOS_SOURCES) \
 
 
 # ASM sources

@@ -84,7 +84,12 @@ PUTCHAR_PROTOTYPE
   return ch;
 }
 /* USER CODE END 0 */
-
+#include "FreeRTOS.h"
+#include "task.h"
+void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
+{
+	printf("%s\r\n", __PRETTY_FUNCTION__);
+}
 /**
   * @brief  The application entry point.
   * @retval int
@@ -278,6 +283,9 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_PIN_GPIO_Port, LED_PIN_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pins : PC13 PC14 PC15 PC0
                            PC1 PC2 PC3 PC4
                            PC5 PC6 PC7 PC8
@@ -290,15 +298,22 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PA0 PA1 PA4 PA5
+  /*Configure GPIO pins : PA1 PA4 PA5
                            PA6 PA7 PA8 PA9
                            PA10 PA13 PA14 PA15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5
+  GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5
                           |GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9
                           |GPIO_PIN_10|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LED_PIN_Pin */
+  GPIO_InitStruct.Pin = LED_PIN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_PIN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PB0 PB1 PB2 PB10
                            PB12 PB13 PB14 PB15
@@ -324,6 +339,20 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void led_on(void)
+{
+  HAL_GPIO_WritePin(LED_PIN_GPIO_Port, LED_PIN_Pin, GPIO_PIN_SET);
+}
+
+void led_off(void)
+{
+  HAL_GPIO_WritePin(LED_PIN_GPIO_Port, LED_PIN_Pin, GPIO_PIN_RESET);
+}
+
+void led_toggle(void)
+{
+  HAL_GPIO_TogglePin(LED_PIN_GPIO_Port, LED_PIN_Pin);
+}
 
 /* USER CODE END 4 */
 

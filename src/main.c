@@ -94,6 +94,7 @@ int main(void)
   HID_KEYBD_Info_TypeDef *keybd_info;
 	static char last_char = 0;
 	char c;
+	ApplicationTypeDef last_state = APPLICATION_DISCONNECT;
 
   /* USER CODE BEGIN 1 */
 
@@ -137,7 +138,9 @@ int main(void)
 	switch (Appli_state)
 	{
 		case APPLICATION_READY:
-		  printf("APPLICATION_READY\r\n");
+		  if (last_state != Appli_state)
+			  printf("APPLICATION_READY\r\n");
+
 		  keybd_info = USBH_HID_GetKeybdInfo(&hUsbHostFS);
 
 		  if(keybd_info != NULL)
@@ -157,18 +160,22 @@ int main(void)
 	  break;
 	  
 	 case APPLICATION_IDLE:
-		printf("APPLICATION IDLE\r\n");
+		if (last_state != Appli_state)
+			printf("APPLICATION IDLE\r\n");
 		break;
 
 	case APPLICATION_START:
-		printf("APPLICATION START\r\n");
+		if (last_state != Appli_state)
+			printf("APPLICATION START\r\n");
 		break;
 
 	case APPLICATION_DISCONNECT:
-		printf("APPLICATION DISCONNECT\r\n");
+		if (last_state != Appli_state)
+			printf("APPLICATION DISCONNECT\r\n");
 	default:
 		break;
   }
+  last_state = Appli_state;
   /* USER CODE END 3 */
 }
 }

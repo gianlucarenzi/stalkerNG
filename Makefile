@@ -31,6 +31,9 @@ OPT = -Og
 # Build path
 BUILD_DIR = build
 
+
+include Makefile.common
+
 ######################################
 # source
 ######################################
@@ -44,45 +47,12 @@ C_SOURCES =  \
 	src/syscalls.c \
 	src/system_stm32f4xx.c \
 
-
-ST_USB_HOST = \
-	USB_HOST/Target/usbh_conf.c \
-	USB_HOST/App/usb_host.c \
-	Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_core.c \
-	Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ctlreq.c \
-	Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ioreq.c \
-	Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c \
-	Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid.c \
-	Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_keybd.c \
-	Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_mouse.c \
-	Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c \
-
-
-ST_DRIVERS = \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_hcd.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
-	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
-
-
 # All sources
 C_SOURCES += \
-	$(ST_DRIVERS) \
-	$(ST_USB_HOST) \
+	$(LIBRARY_C_SOURCES) \
+	
+C_SOURCES += \
+	$(FREEROTS_SOURCES) \
 
 
 # ASM sources
@@ -147,15 +117,9 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 	-Iinc \
-	-IUSB_HOST/App \
-	-IUSB_HOST/Target \
-	-IDrivers/STM32F4xx_HAL_Driver/Inc \
-	-IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
-	-IMiddlewares/ST/STM32_USB_Host_Library/Core/Inc \
-	-IMiddlewares/ST/STM32_USB_Host_Library/Class/HID/Inc \
-	-IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
-	-IDrivers/CMSIS/Include
-
+	$(LIBRARY_C_INCLUDES) \
+	$(FREERTOS_INCLUDES) \
+	
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

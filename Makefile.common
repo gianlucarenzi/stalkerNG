@@ -1,0 +1,97 @@
+# Makefile.common
+
+######################################
+# building variables
+######################################
+# debug build?
+DEBUG = 0
+
+ifeq ($(DEBUG), 1)
+	OPT = -Og
+else
+	# optimization level
+	#OPTLVL = -O2
+	OPTLVL = -O3
+	OPT = $(OPTLVL) -fomit-frame-pointer -funroll-loops
+endif
+
+
+#######################################
+# paths
+#######################################
+# Build path
+BUILD_DIR = build
+
+##########################################
+# Library sources
+##########################################
+LIBRARY_C_SOURCES = \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_hcd.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
+
+
+LIBRARY_C_SOURCES += \
+	USB_HOST/Target/usbh_conf.c \
+	USB_HOST/App/usb_host.c \
+
+
+LIBRARY_C_SOURCES += \
+	Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_core.c \
+	Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ctlreq.c \
+	Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_ioreq.c \
+	Middlewares/ST/STM32_USB_Host_Library/Core/Src/usbh_pipes.c \
+	Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid.c \
+	Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_keybd.c \
+	Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_mouse.c \
+	Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_parser.c \
+
+
+####################################################
+# FreeRTOS sources
+####################################################
+#FREERTOS_SOURCES = \
+#	Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
+#	Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c \
+#	Middlewares/Third_Party/FreeRTOS/Source/queue.c \
+#	Middlewares/Third_Party/FreeRTOS/Source/tasks.c \
+#	Middlewares/Third_Party/FreeRTOS/Source/event_groups.c \
+#	Middlewares/Third_Party/FreeRTOS/Source/croutine.c \
+#	Middlewares/Third_Party/FreeRTOS/Source/list.c \
+#	Middlewares/Third_Party/FreeRTOS/Source/timers.c \
+#	Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c \
+
+
+LIBRARY_C_INCLUDES =  \
+	-IUSB_HOST/App \
+	-IUSB_HOST/Target \
+	-IMiddlewares/ST/STM32_USB_Host_Library/Core/Inc \
+	-IMiddlewares/ST/STM32_USB_Host_Library/Class/HID/Inc \
+	-IDrivers/STM32F4xx_HAL_Driver/Inc \
+	-IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
+	-IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
+	-IDrivers/CMSIS/Include \
+
+
+#FREERTOS_INCLUDES = \
+#	-IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F \
+#	-IMiddlewares/Third_Party/FreeRTOS/Source/include \
+#	-IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS \
+
+
+# End of Makefile.common

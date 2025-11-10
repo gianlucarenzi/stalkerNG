@@ -88,19 +88,114 @@ PUTCHAR_PROTOTYPE
 #include "task.h"
 void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
 {
+	( void ) pcTaskName;
+	( void ) xTask;
 	printf("%s\r\n", __PRETTY_FUNCTION__);
+	for (;;);
 }
+
+void vApplicationMallocFailedHook( void )
+{
+	/* The malloc failed hook is enabled by setting
+	configUSE_MALLOC_FAILED_HOOK to 1 in FreeRTOSConfig.h.
+	Called if a call to pvPortMalloc() fails because there is insufficient
+	free memory available in the FreeRTOS heap. pvPortMalloc() is called
+	internally by FreeRTOS API functions that create tasks, queues, software
+	timers, and semaphores. The size of the FreeRTOS heap is set by the
+	configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
+	printf("%s\r\n", __PRETTY_FUNCTION__);
+	for( ;; );
+}
+extern void vApplicationMallocFailedHook( void );
+
+void vApplicationTickHook( void )
+{
+    /* This function will be called by each tick interrupt if
+    configUSE_TICK_HOOK is set to 1 in FreeRTOSConfig.h.
+    User code can be added here, but the tick hook is normally
+    just used to increment a counter to simulate a software clock. */
+}
+
+void LedTask(void *argument)
+{
+	printf("LedTask Running...\n\r");
+	while (1)
+	{
+		led_on();
+		vTaskDelay(pdMS_TO_TICKS(200));
+		led_off();
+		vTaskDelay(pdMS_TO_TICKS(200));
+	}
+}
+
+void USBTask(void *argument)
+{
+	HID_KEYBD_Info_TypeDef *keybd_info;
+	static char last_char = 0;
+	char c;
+	ApplicationTypeDef last_state = APPLICATION_DISCONNECT;
+
+	printf("USBTask Running...\r\n");
+
+	while (1)
+	{
+		/* USER CODE END WHILE */
+		MX_USB_HOST_Process();
+
+		/* USER CODE BEGIN 3 */
+
+		switch (Appli_state)
+		{
+			case APPLICATION_READY:
+			  if (last_state != Appli_state)
+				  printf("APPLICATION_READY\r\n");
+
+			  keybd_info = USBH_HID_GetKeybdInfo(&hUsbHostFS);
+
+			  if(keybd_info != NULL)
+			  {
+				c = USBH_HID_GetASCIICode(keybd_info);
+				if (c != 0 && c != last_char)
+				{
+				  printf("--> KeyCode: %c\n\r", c);
+				  fflush(stdout);
+				  last_char = c;
+				}
+				else if (c == 0)
+				{
+				  last_char = 0; // Reset on key release
+				}
+			  }
+		  break;
+		  
+		 case APPLICATION_IDLE:
+			if (last_state != Appli_state)
+				printf("APPLICATION IDLE\r\n");
+			break;
+
+		case APPLICATION_START:
+			if (last_state != Appli_state)
+				printf("APPLICATION START\r\n");
+			break;
+
+		case APPLICATION_DISCONNECT:
+			if (last_state != Appli_state)
+				printf("APPLICATION DISCONNECT\r\n");
+		default:
+			break;
+		}
+		last_state = Appli_state;
+		/* USER CODE END 3 */
+	}
+
+}
+
 /**
   * @brief  The application entry point.
   * @retval int
   */
 int main(void)
 {
-  HID_KEYBD_Info_TypeDef *keybd_info;
-	static char last_char = 0;
-	char c;
-	ApplicationTypeDef last_state = APPLICATION_DISCONNECT;
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -128,61 +223,27 @@ int main(void)
   printf("MAIN CALLED\r\n");
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
+  if ( xTaskCreate( USBTask, "USB Task", configMINIMAL_STACK_SIZE * 4, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS )
+  {
+	printf("Error on creating USB task\n\r");
+	while (1) ;;
+  }
+
+  if ( xTaskCreate( LedTask, "Led Task", configMINIMAL_STACK_SIZE * 4, NULL, tskIDLE_PRIORITY + 2, NULL) != pdPASS )
+  {
+	printf("Error on creating LED task\n\r");
+	while (1) ;;
+  }
+  
+  vTaskStartScheduler(); 
 
   /* USER CODE END 2 */
-
+ 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
-
-    /* USER CODE BEGIN 3 */
-
-	switch (Appli_state)
-	{
-		case APPLICATION_READY:
-		  if (last_state != Appli_state)
-			  printf("APPLICATION_READY\r\n");
-
-		  keybd_info = USBH_HID_GetKeybdInfo(&hUsbHostFS);
-
-		  if(keybd_info != NULL)
-		  {
-			c = USBH_HID_GetASCIICode(keybd_info);
-			if (c != 0 && c != last_char)
-			{
-			  printf("--> KeyCode: %c\n\r", c);
-			  fflush(stdout);
-			  last_char = c;
-			}
-			else if (c == 0)
-			{
-			  last_char = 0; // Reset on key release
-			}
-		  }
-	  break;
-	  
-	 case APPLICATION_IDLE:
-		if (last_state != Appli_state)
-			printf("APPLICATION IDLE\r\n");
-		break;
-
-	case APPLICATION_START:
-		if (last_state != Appli_state)
-			printf("APPLICATION START\r\n");
-		break;
-
-	case APPLICATION_DISCONNECT:
-		if (last_state != Appli_state)
-			printf("APPLICATION DISCONNECT\r\n");
-	default:
-		break;
   }
-  last_state = Appli_state;
-  /* USER CODE END 3 */
-}
 }
 
 
